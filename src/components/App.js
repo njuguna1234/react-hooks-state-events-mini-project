@@ -1,43 +1,51 @@
-
 import React, { useState } from "react";
-import TaskList from "./TaskList";
 import CategoryFilter from "./CategoryFilter";
 import NewTaskForm from "./NewTaskForm";
+import TaskList from "./TaskList";
 
-const initialTasks = [
-  { text: "Buy groceries", category: "Home" },
-  { text: "Finish project", category: "Work" },
-  
-];
+import { CATEGORIES, TASKS } from "../data";
+console.log("Here's the data you're working with");
+console.log({ CATEGORIES, TASKS });
 
-const categories = ["All", "Home", "Work", "Personal"]; 
-const App = () => {
-  const [tasks, setTasks] = useState(initialTasks);
-  const [selectedCategory, setSelectedCategory] = useState("All");
-
-  const handleDeleteTask = (taskText) => {
-    setTasks(tasks.filter(task => task.text !== taskText));
-  };
-
-  const handleAddTask = (newTask) => {
-    setTasks([...tasks, newTask]);
-  };
-
-  const filteredTasks = tasks.filter(task =>
-    selectedCategory === "All" || task.category === selectedCategory
-  );
-
+function App() {
+  const [data, setData] = useState(TASKS);
+  const [selectedCategory, setSelectedCategory] = useState("");
+  function handleDelete(id) {
+    setData((data) =>
+      data.filter((item, index) => {
+        return index !== id;
+      })
+    );
+  }
+  function handleFilterCategory(category) {
+    setSelectedCategory(category);
+  }
+  function onTaskFormSubmit(formData){
+    setData([...data,formData])
+  }
+  const itemsToDisplay = data.filter((item) => {
+    if(selectedCategory === "All"){
+      return true
+    }
+    else if (selectedCategory.length > 0) {
+      return item.category === selectedCategory;
+    }
+    else{
+      return true
+    }
+  });
   return (
-    <div>
+    <div className="App">
+      <h2>My tasks</h2>
       <CategoryFilter
-        categories={categories}
+        categories={CATEGORIES}
+        handleFilterCategory={handleFilterCategory}
         selectedCategory={selectedCategory}
-        onSelectCategory={setSelectedCategory}
       />
-      <TaskList tasks={filteredTasks} onDeleteTask={handleDeleteTask} />
-      <NewTaskForm categories={categories} onTaskFormSubmit={handleAddTask} />
+      <NewTaskForm categories={CATEGORIES} onTaskFormSubmit={onTaskFormSubmit}/>
+      <TaskList tasks={itemsToDisplay} handleDelete={handleDelete} />
     </div>
   );
-};
+}
 
 export default App;
